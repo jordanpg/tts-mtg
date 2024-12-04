@@ -1,0 +1,45 @@
+{
+  "name": "mtg-api",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "sourceRoot": "packages/mtg-api/src",
+  "tags": [],
+  "targets": {
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "options": {}
+    },
+    "test": {
+      "executor": "@nx/jest:jest",
+      "options": {
+        "jestConfig": "packages/mtg-api/jest.config.ts",
+        "passWithNoTests": true
+      }
+    },
+    "build": {
+      "executor": "@nx-extend/gcp-functions:build",
+      "options": {
+        "generateLockFile": true,
+        "outputPath": "dist/packages/mtg-api",
+        "main": "packages/mtg-api/src/main.ts",
+        "tsConfig": "packages/mtg-api/tsconfig.app.json",
+        "assets": []
+      },
+      "configurations": {
+        "production": {
+          "optimization": true,
+          "extractLicenses": false,
+          "inspect": false
+        }
+      }
+    },
+    "deploy": {
+      "executor": "@nx-extend/gcp-functions:deploy",
+      "options": {
+        "functionName": "mtg-api",
+        "envVarsFile": "packages/mtg-api/src/environments/production.yaml",
+        "entryPoint": "MtgApi"
+      }
+    }
+  }
+}
