@@ -1,0 +1,10 @@
+{
+  "name": "tts-mtg-importer",
+  "version": "1.0.0",
+  "scripts": {
+    "bundle": "luabundler bundle entry.lua -p \"?.lua\" -p \"?.ttslua\" -o ../../dist/packages/tts-mtg-importer/bundle.lua"
+  },
+  "author": "rubic",
+  "license": "ISC",
+  "description": "A Tabletop Simulator script which is used to import Magic: The Gathering cards into the scene."
+}
