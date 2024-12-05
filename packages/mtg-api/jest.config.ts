@@ -1,7 +1,7 @@
 /* eslint-disable */
 export default {
   displayName: 'mtg-api',
-  preset: '../../jest.preset.js',
+  preset: '../../jest.config.js',
   globals: {
     'ts-jest': {
       tsconfig: '<rootDir>/tsconfig.spec.json',
@@ -10,6 +10,6 @@ export default {
   transform: {
     '^.+\\.[tj]s$': 'ts-jest',
   },
-  moduleFileExtensions: ['ts', 'js', 'html'],
+  moduleFileExtensions: ['ts', 'js', 'html', 'mts'],
   coverageDirectory: '../../coverage/packages/mtg-api',
 };

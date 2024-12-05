@@ -6,12 +6,14 @@
   "targets": {
     "_build": {
       "executor": "@nx/webpack:webpack",
-      "outputs": ["{options.outputPath}"],
+      "outputs": [
+        "{options.outputPath}"
+      ],
       "options": {
         "outputPath": "dist/packages/func-runner",
         "main": "packages/func-runner/src/main.ts",
         "tsConfig": "packages/func-runner/tsconfig.app.json",
-        "webpackConfig": "packages/func-runner/webpack.config.js",
+        "webpackConfig": "packages/func-runner/webpack.config.ts",
         "compiler": "tsc",
         "target": "node",
         "namedChunks": true
