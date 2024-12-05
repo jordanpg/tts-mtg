@@ -6,10 +6,10 @@
     "dev:func": "nx serve func-runner"
   },
   "private": true,
-  "dependencies": {},
   "devDependencies": {
     "@google-cloud/functions-framework": "^3.4.0",
     "@nx-extend/gcp-functions": "^15.2.0",
+    "@nx/eslint": "20.1.4",
     "@nx/js": "20.1.4",
     "@nx/web": "20.1.4",
     "@nx/webpack": "20.1.4",
@@ -17,10 +17,12 @@
     "@swc-node/register": "~1.9.1",
     "@swc/core": "~1.5.7",
     "@swc/helpers": "~0.5.11",
+    "eslint": "~8.57.0",
     "nx": "20.1.4",
     "prettier": "^2.6.2",
     "tslib": "^2.3.0",
     "typescript": "~5.5.2",
     "webpack-cli": "^5.1.4"
-  }
+  },
+  "dependencies": {}
 }
