@@ -13,7 +13,7 @@
         "outputPath": "dist/packages/func-runner",
         "main": "packages/func-runner/src/main.ts",
         "tsConfig": "packages/func-runner/tsconfig.app.json",
-        "webpackConfig": "packages/func-runner/webpack.config.ts",
+        "webpackConfig": "packages/func-runner/webpack.config.js",
         "compiler": "tsc",
         "target": "node",
         "namedChunks": true
