@@ -37,10 +37,9 @@ jobs:
           node-version: 20
           cache: 'pnpm'
 
+      - run: pnpm install -g luabundler
       - run: pnpm install --frozen-lockfile
       - uses: nrwl/nx-set-shas@v4
-
-      - run: pnpm install -g luabundler
 
       # Prepend any command with "nx-cloud record --" to record its logs to Nx Cloud
       # - run: pnpm exec nx-cloud record -- echo Hello World
