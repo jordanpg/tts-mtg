@@ -17,20 +17,15 @@
       }
     },
     "build": {
-      "executor": "@nx-extend/gcp-functions:build",
+      "executor": "@nx/js:swc",
+      "outputs": [
+        "{options.outputPath}"
+      ],
       "options": {
-        "generateLockFile": true,
         "outputPath": "dist/packages/mtg-api",
         "main": "packages/mtg-api/src/main.ts",
         "tsConfig": "packages/mtg-api/tsconfig.app.json",
         "assets": []
-      },
-      "configurations": {
-        "production": {
-          "optimization": true,
-          "extractLicenses": false,
-          "inspect": false
-        }
       }
     },
     "deploy": {
@@ -38,7 +33,8 @@
       "options": {
         "functionName": "mtg-api",
         "envVarsFile": "packages/mtg-api/src/environments/production.yaml",
-        "entryPoint": "MtgApi"
+        "entryPoint": "MtgApi",
+        "region": "us-central1"
       }
     }
   }

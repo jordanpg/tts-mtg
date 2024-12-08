@@ -327,7 +327,7 @@ end
 -- The itemMapper parameter can also be used to map an item's structure before batching.
 function batchFromList(list, batchSize, itemMapper)
     if batchSize == nil then batchSize = 1 end
-    if itemMapper == nil then 
+    if itemMapper == nil then
         itemMapper = function(item) return item end
     end
     local batches = {}
@@ -351,7 +351,7 @@ end
 
 -- This function is for performing a batched fetch to Scryfall's /cards/collections API endpoint.
 -- If a card is not successfully found by Scryfall, the order of the results will likely be changed.
--- 
+--
 ---@param batches table
 --- A table that is an array of arrays of identifiers. The structure of the object looks roughly like:
 --- [ [{id="bcd",name="Arcane Signet"},{id="bcd",name="Arcane Signet"},{id="xyz",name="Gamble"}], [{id="xyz",name="Gamble"},{id="fgh",name="Arcane Signet"}] ]
@@ -383,13 +383,13 @@ function fetchBatchedScryfallCollection(batches, qTbl, callback, isFallbackBatch
                     for j, notFoundCard in ipairs(resCards.not_found) do
                         Player[qTbl.color].broadcast(
                             "Scryfall errored trying to find " .. notFoundCard.name .. " (" .. notFoundCard.set:upper() .. ") " .. notFoundCard.collector_number:upper() .. (notFoundCard.foil and " *F*" or "") .. '!' ..
-                            "\nWill batch a fallback print...", 
+                            "\nWill batch a fallback print...",
                             {1, 0, 0}
                         )
                         table.insert(fuzzyList, notFoundCard)
                     end
-    
-                    local fuzzyBatches = batchFromList(fuzzyList, 20, function(item) 
+
+                    local fuzzyBatches = batchFromList(fuzzyList, 20, function(item)
                         return { name = item.name }
                     end)
 
@@ -492,7 +492,7 @@ function setCard(json, qTbl, originalData)
         if json.object == 'error' then
             Player[qTbl.color].broadcast(
                 "Scryfall errored trying to find " .. originalData.name .. " (" .. originalData.set:upper() .. ") " .. originalData.cn:upper() .. (originalData.foil and " *F*" or "") .. '!' ..
-                "\nNow finding an alternative...", 
+                "\nNow finding an alternative...",
                 {1, 0, 0}
             )
         end
@@ -870,13 +870,13 @@ local DeckSites = {
             end
 
             qTbl.text('Spawning here\nBatching Moxfield results...')
-            local batches = batchFromList(list, 20, function(item) 
-                return { 
-                    id = item.scryfall_id, 
-                    name = item.name, 
-                    set = item.set, 
-                    collector_number = item.cn, 
-                    foil = item.foil 
+            local batches = batchFromList(list, 20, function(item)
+                return {
+                    id = item.scryfall_id,
+                    name = item.name,
+                    set = item.set,
+                    collector_number = item.cn,
+                    foil = item.foil
                 }
             end)
 
@@ -885,7 +885,7 @@ local DeckSites = {
             fetchBatchedScryfallCollection(batches, qTbl, function(scryfallCards)
                 local waitId = nil
                 local done = false
-                local co = coroutine.create(function() 
+                local co = coroutine.create(function()
                     -- load each scryfall card into the game, yielding for each card
                     for i, card in ipairs(scryfallCards) do
                         setCard(card, qTbl, mapIdToOriginalData[card.id])
@@ -1240,7 +1240,7 @@ Booster.MANAMARKET = function(qTbl)
     return pack
 end
 Booster.PLANAR = function(qTbl)
-    -- ((t:plane or t:phenomenon) o:planeswalk) or 
+    -- ((t:plane or t:phenomenon) o:planeswalk) or
     local u = 'http://api.scryfall.com/cards/random?q='
     local additional = "+or+o:'planar+di'+or+o:'will+of+the+planeswalker'"
 
