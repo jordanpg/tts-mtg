@@ -2,7 +2,7 @@
   "name": "tts-mtg-importer",
   "version": "1.0.0",
   "scripts": {
-    "build": "luabundler bundle entry.lua -p \"?.lua\" -p \"?.ttslua\" -o ../../dist/packages/tts-mtg-importer/bundle.lua"
+    "bundle": "luabundler bundle entry.lua -p \"?.lua\" -p \"?.ttslua\" -o ../../dist/packages/tts-mtg-importer/bundle.lua"
   },
   "author": "rubic",
   "license": "ISC",

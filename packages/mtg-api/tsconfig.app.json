@@ -8,6 +8,6 @@
     "importHelpers": false,
     "types": ["node"]
   },
-  "exclude": ["**/*.spec.ts", "**/*.e2e.ts"],
+  "exclude": ["**/*.spec.ts", "**/*.e2e.ts", "jest.config.ts"],
   "include": ["**/*.ts", "**/*.mts"]
 }

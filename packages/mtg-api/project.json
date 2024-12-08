@@ -18,7 +18,9 @@
     },
     "build": {
       "executor": "@nx/js:swc",
-      "outputs": ["{options.outputPath}"],
+      "outputs": [
+        "{options.outputPath}"
+      ],
       "options": {
         "outputPath": "dist/packages/mtg-api",
         "main": "packages/mtg-api/src/main.ts",
@@ -31,7 +33,8 @@
       "options": {
         "functionName": "mtg-api",
         "envVarsFile": "packages/mtg-api/src/environments/production.yaml",
-        "entryPoint": "MtgApi"
+        "entryPoint": "MtgApi",
+        "region": "us-central1"
       }
     }
   }
