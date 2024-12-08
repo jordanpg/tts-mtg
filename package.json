@@ -5,6 +5,7 @@
   "scripts": {
     "dev:func": "nx serve func-runner"
   },
+  "type": "module",
   "private": true,
   "devDependencies": {
     "@eslint/js": "^9.16.0",
