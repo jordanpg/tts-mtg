@@ -2,6 +2,7 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "target": "ES2022",
+    "module": "CommonJS",
     "outDir": "../../dist/out-tsc/packages/mtg-api",
     "declaration": true,
     "importHelpers": false,

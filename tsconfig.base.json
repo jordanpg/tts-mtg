@@ -16,7 +16,9 @@
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "baseUrl": ".",
-    "paths": {}
+    "paths": {
+      "mtg-api/*": ["packages/mtg-api/src/*"]
+    }
   },
   "exclude": ["node_modules", "tmp"]
 }
