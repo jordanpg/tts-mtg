@@ -16,7 +16,9 @@
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "baseUrl": ".",
-    "paths": {}
+    "paths": {
+      "@tts-mtg/deck": ["packages/deck/src/index.ts"]
+    }
   },
   "exclude": ["node_modules", "tmp"]
 }
