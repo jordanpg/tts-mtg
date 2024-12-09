@@ -3,9 +3,14 @@
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "projectType": "application",
   "sourceRoot": "packages/func-runner/src",
+  "tags": [],
   "targets": {
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "options": {}
+    },
     "_build": {
-      "executor": "@nx/webpack:webpack",
+      "executor": "@nx/js:swc",
       "outputs": [
         "{options.outputPath}"
       ],
@@ -13,18 +18,19 @@
         "outputPath": "dist/packages/func-runner",
         "main": "packages/func-runner/src/main.ts",
         "tsConfig": "packages/func-runner/tsconfig.app.json",
-        "webpackConfig": "packages/func-runner/webpack.config.ts",
-        "compiler": "tsc",
-        "target": "node",
-        "namedChunks": true
+        "assets": [],
+        "externalBuildTargets": [
+          "build"
+        ],
+        "external": "none"
       }
     },
     "serve": {
       "executor": "@nx/js:node",
       "options": {
-        "buildTarget": "func-runner:_build"
+        "buildTarget": "func-runner:_build",
+        "runBuildTargetDependencies": true
       }
     }
-  },
-  "tags": []
+  }
 }

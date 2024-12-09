@@ -1,0 +1,2 @@
+moxfieldApi: api.moxfield.com api2.moxfield.com
+requestFilters: /v2/decks/all/.+
