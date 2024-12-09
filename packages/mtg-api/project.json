@@ -10,10 +10,9 @@
       "options": {}
     },
     "test": {
-      "executor": "@nx/jest:jest",
+      "executor": "@nx/vite:test",
       "options": {
-        "jestConfig": "packages/mtg-api/jest.config.ts",
-        "passWithNoTests": true
+        "configFile": "packages/mtg-api/vite.config.ts"
       }
     },
     "build": {
