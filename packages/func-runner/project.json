@@ -5,6 +5,10 @@
   "sourceRoot": "packages/func-runner/src",
   "tags": [],
   "targets": {
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "options": {}
+    },
     "_build": {
       "executor": "@nx/js:swc",
       "outputs": [

@@ -1,15 +1,16 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
-    "outDir": "../../dist/out-tsc/packages/mtg-api",
-    "declaration": true,
-    "importHelpers": false,
-    "types": ["node"]
+    "outDir": "../../dist/out-tsc",
+    "types": [
+      "vitest/globals",
+      "vitest/importMeta",
+      "vite/client",
+      "node",
+      "vitest"
+    ]
   },
-  "exclude": [
-    "**/*.spec.ts",
-    "**/*.e2e.ts",
-    "jest.config.ts",
+  "include": [
     "vite.config.ts",
     "vite.config.mts",
     "vitest.config.ts",
@@ -22,7 +23,6 @@
     "src/**/*.spec.js",
     "src/**/*.test.jsx",
     "src/**/*.spec.jsx",
-    "eslint.config.mjs"
-  ],
-  "include": ["**/*.ts", "**/*.mts"]
+    "src/**/*.d.ts"
+  ]
 }

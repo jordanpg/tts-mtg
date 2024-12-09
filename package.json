@@ -37,5 +37,6 @@
     "vite": "^5.0.0",
     "vitest": "^2.1.8",
     "webpack-cli": "^5.1.4"
-  }
+  },
+  "dependencies": {}
 }

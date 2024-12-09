@@ -1,4 +1,4 @@
-import { deck } from './deck';
+import { deck } from './deck.js';
 
 describe('deck', () => {
   it('should work', () => {

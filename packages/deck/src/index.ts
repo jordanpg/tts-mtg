@@ -1,2 +1,2 @@
-export * from './lib/deck';
-export * from './types';
+export * from './lib/deck.js';
+export * from './types/index.js';
