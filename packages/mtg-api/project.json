@@ -7,13 +7,15 @@
   "targets": {
     "lint": {
       "executor": "@nx/eslint:lint",
-      "options": {}
+      "options": {
+        "eslintConfig": "packages/mtg-api/eslint.config.js",
+        "quiet": true
+      }
     },
     "test": {
-      "executor": "@nx/jest:jest",
+      "executor": "@nx/vite:test",
       "options": {
-        "jestConfig": "packages/mtg-api/jest.config.ts",
-        "passWithNoTests": true
+        "configFile": "packages/mtg-api/vite.config.ts"
       }
     },
     "build": {

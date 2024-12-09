@@ -1,0 +1,35 @@
+{
+  "name": "moxfield-proxy",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "packages/moxfield-proxy/src",
+  "projectType": "application",
+  "tags": [],
+  "targets": {
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "options": {}
+    },
+    "build": {
+      "executor": "@nx/js:swc",
+      "outputs": [
+        "{options.outputPath}"
+      ],
+      "options": {
+        "outputPath": "dist/packages/moxfield-proxy",
+        "main": "packages/moxfield-proxy/src/index.ts",
+        "tsConfig": "packages/moxfield-proxy/tsconfig.app.json",
+        "assets": []
+      }
+    },
+    "deploy": {
+      "executor": "@nx-extend/gcp-functions:deploy",
+      "options": {
+        "functionName": "moxfield-proxy",
+        "envVarsFile": "packages/moxfield-proxy/src/environments/production.yaml",
+        "entryPoint": "MoxfieldProxy",
+        "region": "us-central1",
+        "runtime": "nodejs22"
+      }
+    }
+  }
+}
