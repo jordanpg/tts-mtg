@@ -59,6 +59,8 @@ jobs:
       - name: Build tts-mtg-importer
         run: pnpm exec nx build tts-mtg-importer
 
+      - run: ls -R ./dist
+
       # For build artifacts which need publicly accessible links, individual steps should be used!
       - name: 'Upload build artifact: Importer'
         uses: actions/upload-artifact@v4
