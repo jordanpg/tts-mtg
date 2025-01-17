@@ -59,7 +59,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: dist-all
-          path: dist/packages
+          path: /dist/packages
 
       # For build artifacts which need publicly accessible links, individual steps should be used!
 
@@ -67,6 +67,6 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: dist-importer
-          path: dist/packages/tts-mtg-importer/bundle.lua
+          path: /dist/packages/tts-mtg-importer/bundle.lua
           if-no-files-found: error
           include-hidden-files: true
