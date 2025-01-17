@@ -1,0 +1,125 @@
+-- This adds support for the Encoder module to the card importer.
+
+local ttsUtils = require("tts_utils")
+
+local M = {}
+
+function M.registerModule()
+    local pID = _G.MOD_NAME
+    local enc = Global.getVar('Encoder')
+    if enc then
+        local prop = {
+            name = pID,
+            funcOwner = self,
+            activateFunc = 'toggleMenu'
+        }
+        local v = enc.getVar('version')
+        M.buttons = {'Respawn', 'Oracle', 'Rulings', 'Emblem\nAnd Tokens', 'Printings', 'Set Sleeve', 'Reverse Card'}
+        if v and (type(v) == 'string' and tonumber(v:match('%d+%.%d+')) or v) < 4.4 then
+            prop.toolID = pID
+            prop.display = true
+            enc.call('APIregisterTool', prop)
+        else
+            prop.values = {}
+            prop.visible = true
+            prop.propID = pID
+            prop.tags = 'tool,cardImporter'
+            enc.call('APIregisterProperty', prop)
+        end
+        function M.eEmblemAndTokens(o, p)
+            M.ENC(o, p, 'Token')
+        end
+        function M.eOracle(o, p)
+            M.ENC(o, p, 'Text')
+        end
+        function M.eRulings(o, p)
+            M.ENC(o, p, 'Rules')
+        end
+        function M.ePrintings(o, p)
+            M.ENC(o, p, 'Print')
+        end
+        function M.eRespawn(o, p)
+            M.ENC(o, p, 'Spawn')
+        end
+        function M.eSetSleeve(o, p)
+            M.ENC(o, p, 'Back')
+        end
+        function M.eReverseCard(o, p)
+            M.ENC(o, p)
+            spawnObjectJSON({
+                json = o.getJSON():gsub('BackURL', 'FaceURL'):gsub('FaceURL', 'BackURL', 1)
+            })
+        end
+    end
+end
+
+function M.ENC(o, p, m)
+    M.enc.call('APIrebuildButtons', {
+        obj = o
+    })
+    if m then
+        if o.getName() == '' and m ~= 'Back' then
+            Player[p].broadcast('Card has no name!', {1, 0, 1})
+        else
+            local oracleid = nil
+            if o.memo ~= nil and o.memo ~= '' then
+                oracleid = 'oracleid:' .. o.memo
+            end
+            Importer({
+                position = o.getPosition() + Vector(0, 1, 0) + o.getTransformRight():scale(-2.4),
+                target = o,
+                player = Player[p].steam_id,
+                color = p,
+                oracleid = oracleid,
+                name = o.getName():gsub('\n.*', '') or 'Energy Reserve',
+                mode = m,
+                full = 'Card Encoder'
+            })
+        end
+    end
+end
+
+function M.toggleMenu(o)
+    local enc = Global.getVar('Encoder')
+    if enc then
+        local flip = enc.call("APIgetFlip", {
+            obj = o
+        })
+        for i, v in ipairs(M.buttons) do
+            M.Button(o, v, flip)
+        end
+        M.Button:reset()
+    end
+end
+
+M.Button = setmetatable({
+    label = 'UNDEFINED',
+    click_function = 'eOracle',
+    function_owner = M,
+    height = 400,
+    width = 2100,
+    font_size = 360,
+    scale = {0.4, 0.4, 0.4},
+    position = {0, 0.28, -1.35},
+    rotation = {0, 0, 90},
+    reset = function(t)
+        t.label = 'UNDEFINED';
+        t.position = {0, 0.28, -1.35}
+    end
+}, {
+    __call = function(t, o, l, f)
+        local inc, i = 0.325, 0
+        l:gsub('\n', function()
+            t.height, inc, i = t.height + 400, inc + 0.1625, i + 1
+        end)
+        t.label, t.click_function, t.position, t.rotation[3] = l, 'e' .. l:gsub('%s', ''),
+            {0, 0.28 * f, t.position[3] + inc}, 90 - 90 * f
+        o.createButton(t)
+        t.height = 400
+        if i % 2 == 1 then
+            t.position[3] = t.position[3] + 0.1625
+        end
+    end
+})
+
+return M

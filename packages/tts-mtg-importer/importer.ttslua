@@ -11,6 +11,14 @@ GIT_URL = 'https://raw.githubusercontent.com/jordanpg/Tabletop-Simulator-Scripts
 LANG = 'en'
 self.setName('[854FD9]' .. MOD_NAME .. ' [49D54F]' .. version)
 
+_G.MOD_NAME = MOD_NAME
+
+--[[ Imports ]]
+
+local utils = require("utils")
+local ttsUtils = require("tts_utils")
+local encoderIntegration = require("encoder_integration")
+
 --[[ Classes ]]
 
 -- metatable for special object functionality
@@ -58,8 +66,8 @@ newText = setmetatable({
         thisObj.TextTool.setFontSize(fontSize or 50)
 
         --[[
-        testLog('Creating new '.. this.type .. ' text item:', nil, 'debug')
-        testLog(text, nil, 'trace')
+        ttsUtils.testLog('Creating new '.. this.type .. ' text item:', nil, 'debug')
+        ttsUtils.testLog(text, nil, 'trace')
         --]]
 
         return function(t)
@@ -84,6 +92,7 @@ local Tick = 0.2    -- time to wait between webrequests, to prevent Too Many Req
 local Test = true  -- set to true when performing tests with this script
 local Quality = TBL.new('normal', {})
 local Back = TBL.new('https://i.stack.imgur.com/787gj.png', {})
+_G.Test = Test
 
 --- Block comment describing how to use the Importer
 local Usage = [[[b]%s
@@ -124,19 +133,6 @@ local DefaultBackState = [[{
 "76561198317076000":"https://i.imgur.com/vh8IeEn.jpeg"}]]
 
 -- Image URI Handler
-
---- Converts a URI (usually a Scryfall image link) to a specific quality and removes unneeded query data.
-function truncateURI(uri, quality, suffix)
-    --[[
-    testLog('Now running truncateURI on the following data:', nil, 'debug')
-    testLog(JSON.encode_pretty({uri, quality, suffix}), nil, 'trace')
-    --]]
-
-    if quality == 'png' then
-        uri = uri:gsub('.jpg', '.png')
-    end
-    return uri:gsub('%?.*', ''):gsub('normal', quality) .. suffix
-end
 
 --[[ Card Spawning Class ]]
 
@@ -203,8 +199,8 @@ local Card = setmetatable({
             if qTbl.deck and qTbl.image and qTbl.image[n] then
                 scryfallCard.face = qTbl.image[n]
             elseif scryfallCard.card_faces and not scryfallCard.image_uris then -- DFC REWORKED for STATES!
-                local faceAddress = truncateURI(scryfallCard.card_faces[1].image_uris.normal, qual, imgSuffix)
-                local backAddress = truncateURI(scryfallCard.card_faces[2].image_uris.normal, qual, imgSuffix)
+                local faceAddress = utils.truncateURI(scryfallCard.card_faces[1].image_uris.normal, qual, imgSuffix)
+                local backAddress = utils.truncateURI(scryfallCard.card_faces[2].image_uris.normal, qual, imgSuffix)
                 if faceAddress:find('/back/') and backAddress:find('/front/') then
                     local temp = faceAddress;
                     faceAddress = backAddress;
@@ -256,7 +252,7 @@ local Card = setmetatable({
                 scryfallCard.face = this.customImage
                 this.customImage = false
             elseif scryfallCard.image_uris then
-                scryfallCard.face = truncateURI(scryfallCard.image_uris.normal, qual, imgSuffix)
+                scryfallCard.face = utils.truncateURI(scryfallCard.image_uris.normal, qual, imgSuffix)
             end
 
             -- prepare cardDat
@@ -313,7 +309,7 @@ local Card = setmetatable({
                     rotation = Vector(0, Player[qTbl.color].getPointerRotation(), 0)
                 }
                 spawnObjectData(spawnDat)
-                testLog(qTbl.color .. ' spawned "' .. scryfallCard.name:gsub('\n.*', '') .. '".', nil, 'info')
+                ttsUtils.testLog(qTbl.color .. ' spawned "' .. scryfallCard.name:gsub('\n.*', '') .. '".', nil, 'info')
                 endLoop()
             else -- Spawn deck
                 if Deck == 1 then -- initialize deckDat
@@ -352,7 +348,7 @@ local Card = setmetatable({
                     }
                     spawnObjectData(spawnDat)
                     Player[qTbl.color].broadcast('All ' .. Deck .. ' cards loaded!', {0.5, 0.5, 0.5})
-                    testLog(qTbl.color .. ' loaded ' .. Deck .. ' cards.', nil, 'info')
+                    ttsUtils.testLog(qTbl.color .. ' loaded ' .. Deck .. ' cards.', nil, 'info')
                     Deck = 1
                     endLoop()
                 end
@@ -362,8 +358,8 @@ local Card = setmetatable({
         -- if the call to Card fails, print error and reload
         if not success then
             --[[
-                testLog(errorMSG, 'Card() returned an error!', 'error')
-                testLog(cardMetadataStr, nil, 'trace')
+                ttsUtils.testLog(errorMSG, 'Card() returned an error!', 'error')
+                ttsUtils.testLog(cardMetadataStr, nil, 'trace')
             --]]
             printToAll('Something went wrong and the importer crashed, giving the error:', {1, 0, 0})
             printToAll(errorMSG, {0.8, 0, 0})
@@ -380,8 +376,8 @@ local Card = setmetatable({
             self.reload()
         else
             --[[
-                testLog('Card() performed successfully.', nil, 'debug')
-                testLog(cardMetadataStr, nil, 'trace')
+                ttsUtils.testLog('Card() performed successfully.', nil, 'debug')
+                ttsUtils.testLog(cardMetadataStr, nil, 'trace')
             --]]
         end
     end
@@ -400,35 +396,6 @@ function setOracle(card)
         str = false
     end
     return card.oracle_text:gsub('\"', "'") .. (str and str .. '[/b]' or '')
-end
-
---- This function converts a list of the following structure:
---- [{}, {}, {}, {}, {}]
---- Into batches of the given size with the following example structure (batch size of 3):
---- [[{}, {}, {}], [{}, {}]]
---- The itemMapper parameter can also be used to map an item's structure before batching.
-function batchFromList(list, batchSize, itemMapper)
-    if batchSize == nil then batchSize = 1 end
-    if itemMapper == nil then
-        itemMapper = function(item) return item end
-    end
-    local batches = {}
-    local currentBatch = {}
-    for i, item in ipairs(list) do
-        if #currentBatch == batchSize then
-            -- this batch is full, move onto the next batch
-            table.insert(batches, currentBatch)
-            currentBatch = {}
-        end
-
-        if #currentBatch < batchSize then
-            -- insert the mapped item into the current batch as long as there's room
-            table.insert(currentBatch, itemMapper(item))
-        end
-    end
-    -- insert final batch
-    table.insert(batches, currentBatch)
-    return batches
 end
 
 --- This function is for performing a batched fetch to Scryfall's /cards/collections API endpoint.
@@ -456,7 +423,7 @@ function fetchBatchedScryfallCollection(batches, qTbl, callback, isFallbackBatch
             qTbl.text('Spawning here\nFetching ' .. (isFallbackBatches and 'fallback ' or '') .. 'batch ' .. i .. '/' .. #batches .. '...')
             local wr = WebRequest.custom('https://api.scryfall.com/cards/collection/', 'POST', true, JSON.encode({identifiers = batch}), { ["Content-Type"] = "application/json", Accept = "application/json" }, function(res)
                 -- local text = res.text
-                -- writeNotebook("Scryfall text", text)
+                -- ttsUtils.writeNotebook("Scryfall text", text)
                 -- print("Received " .. #text .. " characters from Scryfall.")
                 local resCards = JSON.decode(res.text)
 
@@ -471,7 +438,7 @@ function fetchBatchedScryfallCollection(batches, qTbl, callback, isFallbackBatch
                         table.insert(fuzzyList, notFoundCard)
                     end
 
-                    local fuzzyBatches = batchFromList(fuzzyList, 20, function(item)
+                    local fuzzyBatches = utils.batchFromList(fuzzyList, 20, function(item)
                         return { name = item.name }
                     end)
 
@@ -615,7 +582,7 @@ end
 end]]
 
 function spawnList(wr, qTbl)
-    testLog(wr.url)
+    ttsUtils.testLog(wr.url)
     local txt = wr.text
     if txt then -- PIE's Rework
         local jsonType = txt:sub(1, 20):match('{"object":"(%w+)"')
@@ -724,14 +691,14 @@ local dFile = {
 
 function spawnDeck(wr, qTbl)
     if wr.text:find('!DOCTYPE') then
-        testLog(wr.url, 'Mal Formated Deck ' .. qTbl.color, 'error')
-        writeNotebook('D' .. qTbl.color, wr.url)
+        ttsUtils.testLog(wr.url, 'Mal Formated Deck ' .. qTbl.color, 'error')
+        ttsUtils.writeNotebook('D' .. qTbl.color, wr.url)
         Player[qTbl.color].broadcast('Your Deck list could not be found\nMake sure the Deck is set to PUBLIC',
             {1, 0.5, 0})
         textItems[#textItems].destruct()
         table.remove(textItems, #textItems)
     else
-        testLog(wr.url, 'Deck Spawned by ' .. qTbl.color, 'debug')
+        ttsUtils.testLog(wr.url, 'Deck Spawned by ' .. qTbl.color, 'debug')
         local sideboard = ''
         qTbl.image = {}
         local deck, list = {}, wr.text:gsub('\n%S*Sideboard(.*)', function(a)
@@ -741,7 +708,7 @@ function spawnDeck(wr, qTbl)
         if sideboard ~= '' then
             Player[qTbl.color].broadcast(
                 'Extraboards Found and pasted into Notebook\n"Scryfall deck" to spawn most recent Notebook Tab')
-            writeNotebook(qTbl.url, sideboard)
+            ttsUtils.writeNotebook(qTbl.url, sideboard)
         end
 
         for b in list:gmatch('([^\r\n]+)') do
@@ -784,7 +751,7 @@ function spawnDeckFromScryfall(wr, qTbl)
     if side ~= '' then
         Player[qTbl.color].broadcast(
             'Sideboard Found and pasted into Notebook\n"Scryfall deck" to spawn most recent Notebook Tab')
-        writeNotebook(qTbl.url, side)
+        ttsUtils.writeNotebook(qTbl.url, side)
     end
 
     qTbl.deck = #deck
@@ -822,7 +789,7 @@ function spawnCSV(wr, qTbl)
             end
         end
         if #tbl < setCSV - 1 then
-            testLog(tbl)
+            ttsUtils.testLog(tbl)
             printToAll('Tell Amuzet that an Error occored in spawnCSV:\n' .. qTbl.full)
             endLoop()
             return
@@ -837,13 +804,13 @@ function spawnCSV(wr, qTbl)
             end
         else -- Side/Maybe
             side = side .. tbl[2] .. ' ' .. tbl[3] .. '\n'
-            testLog(side)
+            ttsUtils.testLog(side)
         end
     end
     if side ~= '' then
         Player[qTbl.color].broadcast(
             'Sideboard Found and pasted into Notebook\n"Scryfall deck" to spawn most recent Notebook Tab')
-        writeNotebook(qTbl.url, side)
+        ttsUtils.writeNotebook(qTbl.url, side)
     end
     qTbl.deck = #deck
     for i, u in ipairs(deck) do
@@ -878,7 +845,7 @@ local DeckHandlers = {
         return url, function(wr, qTbl)
 
             qTbl.text('Spawning here\nFetching list from Moxfield...')
-            writeNotebook("wr.text", wr.text)
+            ttsUtils.writeNotebook("wr.text", wr.text)
             local deckName = wr.text:match('"name":"(.-)","description"'):gsub('(\\u....)', ''):gsub('%W', '')
             local startInd = 1
             local endInd
@@ -947,7 +914,7 @@ local DeckHandlers = {
             end
 
             qTbl.text('Spawning here\nBatching Moxfield results...')
-            local batches = batchFromList(list, 20, function(item)
+            local batches = utils.batchFromList(list, 20, function(item)
                 return {
                     id = item.scryfall_id,
                     name = item.name,
@@ -976,7 +943,7 @@ local DeckHandlers = {
 
             if sideboard ~= '' then
                 Player[qTbl.color].broadcast(deckName .. ' Sideboard and Maybeboard in notebook.\nType "Scryfall deck" to spawn it now.')
-                writeNotebook(deckName .. " SBs and Maybes", sideboard)
+                ttsUtils.writeNotebook(deckName .. " SBs and Maybes", sideboard)
             end
         end
     end,
@@ -1047,7 +1014,7 @@ local DeckHandlers = {
             if board ~= '' then
                 Player[qTbl.color].broadcast(json.name ..
                                                  ' Sideboard and Maybeboard in notebook.\nType "Scryfall deck" to spawn it now.')
-                writeNotebook(json.name, board)
+                ttsUtils.writeNotebook(json.name, board)
             end
         end
     end,
@@ -1631,7 +1598,7 @@ Importer = setmetatable({
                         text = 'No Rulings'
                     end
                     if text:len() > 1000 then
-                        writeNotebook(cardDat.name, text)
+                        ttsUtils.writeNotebook(cardDat.name, text)
                         broadcastToAll('Rulings are too long!\nFull rulings can be found in the Notebook',
                             {0.9, 0.9, 0.9})
                     elseif qTbl.target then
@@ -1758,7 +1725,7 @@ Importer = setmetatable({
                 url = url .. (q1 .. ' '):gsub('%+ ', ''):gsub(' ', '')
             end
         end
-        testLog(url, qTbl.color .. ' Importer ' .. qTbl.full)
+        ttsUtils.testLog(url, qTbl.color .. ' Importer ' .. qTbl.full)
         local n = tonumber(qTbl.full:match('%s(%d+)'))
         if n then
             qTbl.deck = n
@@ -1808,16 +1775,16 @@ Importer = setmetatable({
                 end
             end
         elseif qTbl.mode == 'Deck' then
-            testLog('1/4 raw deck is being spawned')
+            ttsUtils.testLog('1/4 raw deck is being spawned')
             local d = getNotebookTabs();
-            testLog('2/4 got notebook tabs')
+            ttsUtils.testLog('2/4 got notebook tabs')
             d = d[#d]
-            testLog('3/4 set d or whatever')
+            ttsUtils.testLog('3/4 set d or whatever')
             spawnDeck({
                 text = d.body,
                 url = 'Notebook ' .. d.title .. d.color
             }, qTbl)
-            testLog('4/4 spawned deck!')
+            ttsUtils.testLog('4/4 spawned deck!')
         end
         return false
     end,
@@ -1909,51 +1876,11 @@ function delay(fN, tbl)
     Timer.create(timerParams)
 end
 
---- Performs a log to the TTS console, but only in test environments!
-function testLog(value, label, tags)
-    if Test then
-        log(value, label, tags)
-    end
-end
-
 local SMG, SMC = '[b]Scryfall: [/b]', {0.5, 1, 0.8}
 
 --- A test function for printing messages to all players.
 function AP(p, s)
     printToAll(SMG .. s:format(p.steam_name), SMC)
-end
-
--- specify log styles
-local showLogPrefix = false
-logStyle('info', {1, 1, 1}, showLogPrefix and '[INFO]' or '', '')
-logStyle('warn', {1, 1, 0}, showLogPrefix and '[WARN]' or '', '')
-logStyle('error', {1, 0.1, 0.1}, showLogPrefix and '[ERROR]' or '', '')
-logStyle('debug', {0, 1, 1}, showLogPrefix and '[DEBUG]' or '', '')
-logStyle('trace', {0.5, 0.5, 0.5}, showLogPrefix and '[TRACE]' or '', '')
-
---- Creates a new Notebook entry with the given title and body text, and with the given color.
---- If another entry already shares the same title, the content is replaced instead of making a new notebook entry.
---- If no color is supplied, the color of the entry will be grey.
---- @return number
---- The index of the notebook that was affected by this call.
-function writeNotebook(title, body, color)
-    local p = {
-        index = -1,
-        title = title,
-        body = body or '',
-        color = color or 'Grey'
-    }
-    for i, v in ipairs(getNotebookTabs()) do
-        if v.title == p.title then
-            p.index = i
-        end
-    end
-    if p.index < 0 then
-        addNotebookTab(p)
-    else
-        editNotebookTab(p)
-    end
-    return p.index
 end
 
 --- Reports information to the server about this script's version.
@@ -1983,7 +1910,7 @@ function enforceVersion(wr)
         self.setLuaScript(wr.text)
         self.reload()
     else
-        registerModule()
+        encoderIntegration.registerModule()
     end
 end
 
@@ -2048,7 +1975,7 @@ function onLoad(data)
     self.createButton({
         label = "+",
         click_function = 'registerModule',
-        function_owner = self,
+        function_owner = encoderIntegration,
         position = {0, 0.2, -0.5},
         height = 100,
         width = 100,
@@ -2059,9 +1986,9 @@ function onLoad(data)
     -- send usage details to notebook
     Usage = Usage:format(self.getName())
     local usageNotebookTitle = MOD_NAME .. ' ' .. version .. ' Usage'
-    writeNotebook(usageNotebookTitle, Usage)
+    ttsUtils.writeNotebook(usageNotebookTitle, Usage)
     --[[
-    writeNotebook('Importer onLoad() script_state',self.script_state)
+    ttsUtils.writeNotebook('Importer onLoad() script_state',self.script_state)
     --]]
 
     -- send shortened usage details to description and print to all
@@ -2188,130 +2115,11 @@ function onChat(msg, player)
 
             -- console log message if necessary
             if chatToggle then
-                testLog(msg, player.steam_name)
+                ttsUtils.testLog(msg, player.steam_name)
                 return false
             end
         end
     end
 end
 
---[[ Card Encoder Compatibility ]]
-
-pID = MOD_NAME
-function registerModule()
-    enc = Global.getVar('Encoder')
-    if enc then
-        local prop = {
-            name = pID,
-            funcOwner = self,
-            activateFunc = 'toggleMenu'
-        }
-        local v = enc.getVar('version')
-        buttons = {'Respawn', 'Oracle', 'Rulings', 'Emblem\nAnd Tokens', 'Printings', 'Set Sleeve', 'Reverse Card'}
-        if v and (type(v) == 'string' and tonumber(v:match('%d+%.%d+')) or v) < 4.4 then
-            prop.toolID = pID
-            prop.display = true
-            enc.call('APIregisterTool', prop)
-        else
-            prop.values = {}
-            prop.visible = true
-            prop.propID = pID
-            prop.tags = 'tool,cardImporter,Amuzet'
-            enc.call('APIregisterProperty', prop)
-        end
-        function eEmblemAndTokens(o, p)
-            ENC(o, p, 'Token')
-        end
-        function eOracle(o, p)
-            ENC(o, p, 'Text')
-        end
-        function eRulings(o, p)
-            ENC(o, p, 'Rules')
-        end
-        function ePrintings(o, p)
-            ENC(o, p, 'Print')
-        end
-        function eRespawn(o, p)
-            ENC(o, p, 'Spawn')
-        end
-        function eSetSleeve(o, p)
-            ENC(o, p, 'Back')
-        end
-        function eReverseCard(o, p)
-            ENC(o, p)
-            spawnObjectJSON({
-                json = o.getJSON():gsub('BackURL', 'FaceURL'):gsub('FaceURL', 'BackURL', 1)
-            })
-        end
-    end
-end
-
-function ENC(o, p, m)
-    enc.call('APIrebuildButtons', {
-        obj = o
-    })
-    if m then
-        if o.getName() == '' and m ~= 'Back' then
-            Player[p].broadcast('Card has no name!', {1, 0, 1})
-        else
-            local oracleid = nil
-            if o.memo ~= nil and o.memo ~= '' then
-                oracleid = 'oracleid:' .. o.memo
-            end
-            Importer({
-                position = o.getPosition() + Vector(0, 1, 0) + o.getTransformRight():scale(-2.4),
-                target = o,
-                player = Player[p].steam_id,
-                color = p,
-                oracleid = oracleid,
-                name = o.getName():gsub('\n.*', '') or 'Energy Reserve',
-                mode = m,
-                full = 'Card Encoder'
-            })
-        end
-    end
-end
-
-function toggleMenu(o)
-    enc = Global.getVar('Encoder')
-    if enc then
-        flip = enc.call("APIgetFlip", {
-            obj = o
-        })
-        for i, v in ipairs(buttons) do
-            Button(o, v, flip)
-        end
-        Button:reset()
-    end
-end
-
-Button = setmetatable({
-    label = 'UNDEFINED',
-    click_function = 'eOracle',
-    function_owner = self,
-    height = 400,
-    width = 2100,
-    font_size = 360,
-    scale = {0.4, 0.4, 0.4},
-    position = {0, 0.28, -1.35},
-    rotation = {0, 0, 90},
-    reset = function(t)
-        t.label = 'UNDEFINED';
-        t.position = {0, 0.28, -1.35}
-    end
-}, {
-    __call = function(t, o, l, f)
-        local inc, i = 0.325, 0
-        l:gsub('\n', function()
-            t.height, inc, i = t.height + 400, inc + 0.1625, i + 1
-        end)
-        t.label, t.click_function, t.position, t.rotation[3] = l, 'e' .. l:gsub('%s', ''),
-            {0, 0.28 * f, t.position[3] + inc}, 90 - 90 * f
-        o.createButton(t)
-        t.height = 400
-        if i % 2 == 1 then
-            t.position[3] = t.position[3] + 0.1625
-        end
-    end
-})
 -- EOF
