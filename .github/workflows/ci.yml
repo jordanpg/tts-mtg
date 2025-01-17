@@ -56,8 +56,7 @@ jobs:
         run: pnpm exec nx affected -t lint test build --exclude func-runner
 
       # For build artifacts which need publicly accessible links, individual steps should be used!
-      - run: ls ./dist
-      - run: ls ${{ github.workspace }}/dist/tts-mtg-importer
+      - run: ls -R ./dist
 
       - name: 'Upload build artifact: Importer'
         uses: actions/upload-artifact@v4
