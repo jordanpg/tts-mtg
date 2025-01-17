@@ -56,14 +56,14 @@ jobs:
         run: pnpm exec nx affected -t lint test build --exclude func-runner
 
       # For build artifacts which need publicly accessible links, individual steps should be used!
-      - run: ls .
-      - run: ls ${{ github.workspace }}/dist/packages/tts-mtg-importer
+      - run: ls ./dist
+      - run: ls ${{ github.workspace }}/dist/tts-mtg-importer
 
       - name: 'Upload build artifact: Importer'
         uses: actions/upload-artifact@v4
         with:
           name: dist-importer
           path: |
-            ${{ github.workspace }}/dist/packages/tts-mtg-importer/bundle.lua
+            ${{ github.workspace }}/dist/tts-mtg-importer/bundle.lua
           if-no-files-found: error
           include-hidden-files: true
