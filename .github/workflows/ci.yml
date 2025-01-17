@@ -64,7 +64,6 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: dist-importer
-          path: |
-            ${{ github.workspace }}/dist/tts-mtg-importer/bundle.lua
+          path: dist/packages/tts-mtg-importer/bundle.lua
           if-no-files-found: error
           include-hidden-files: true
