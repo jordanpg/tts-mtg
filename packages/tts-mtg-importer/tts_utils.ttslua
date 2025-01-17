@@ -1,0 +1,44 @@
+local M = {}
+
+-- specify log styles
+local showLogPrefix = false
+logStyle('info', {1, 1, 1}, showLogPrefix and '[INFO]' or '', '')
+logStyle('warn', {1, 1, 0}, showLogPrefix and '[WARN]' or '', '')
+logStyle('error', {1, 0.1, 0.1}, showLogPrefix and '[ERROR]' or '', '')
+logStyle('debug', {0, 1, 1}, showLogPrefix and '[DEBUG]' or '', '')
+logStyle('trace', {0.5, 0.5, 0.5}, showLogPrefix and '[TRACE]' or '', '')
+
+--- Performs a log to the TTS console, but only in test environments!
+function M.testLog(value, label, tags)
+    -- refers to the global variable for the test environment
+    if _G.Test then
+        log(value, label, tags)
+    end
+end
+
+--- Creates a new Notebook entry with the given title and body text, and with the given color.
+--- If another entry already shares the same title, the content is replaced instead of making a new notebook entry.
+--- If no color is supplied, the color of the entry will be grey.
+--- @return number
+--- The index of the notebook that was affected by this call.
+function M.writeNotebook(title, body, color)
+    local p = {
+        index = -1,
+        title = title,
+        body = body or '',
+        color = color or 'Grey'
+    }
+    for i, v in ipairs(getNotebookTabs()) do
+        if v.title == p.title then
+            p.index = i
+        end
+    end
+    if p.index < 0 then
+        addNotebookTab(p)
+    else
+        editNotebookTab(p)
+    end
+    return p.index
+end
+
+return M

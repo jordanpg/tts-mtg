@@ -13,7 +13,7 @@
         "{projectRoot}/**/*.lua"
       ],
       "outputs": [
-        "{workspaceRoot}/dist/packages/ts-mtg-importer"
+        "{workspaceRoot}/dist/packages/tts-mtg-importer"
       ],
       "options": {
         "script": "bundle"
