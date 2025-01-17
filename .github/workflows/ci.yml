@@ -52,12 +52,14 @@ jobs:
       # Prepend any command with "nx-cloud record --" to record its logs to Nx Cloud
       # - run: pnpm exec nx-cloud record -- echo Hello World
       # Nx Affected runs only tasks affected by the changes in this PR/commit. Learn more: https://nx.dev/ci/features/affected
-      - name: Perform nx affected tests
-        run: pnpm exec nx affected -t lint test build --exclude func-runner
+      - name: Perform nx affected
+        run: pnpm exec nx affected -t lint test build --exclude 'func-runner,tts-mtg-importer'
+
+      # Explicitly building tts-mtg-importer so the artifact is always created
+      - name: Build tts-mtg-importer
+        run: pnpm exec nx build tts-mtg-importer
 
       # For build artifacts which need publicly accessible links, individual steps should be used!
-      - run: ls -R ./dist
-
       - name: 'Upload build artifact: Importer'
         uses: actions/upload-artifact@v4
         with:
