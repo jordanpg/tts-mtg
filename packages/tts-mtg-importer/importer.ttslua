@@ -5,7 +5,7 @@
 --[[ Constants ]]
 
 MOD_NAME = 'Card Importer'
-version = 2.011 -- this property has to remain in lowercase as "version" to maintain compatibility with scripts like the Encoder
+version = 2.101 -- this property has to remain in lowercase as "version" to maintain compatibility with scripts like the Encoder
 WORKSHOP_ID = 'https://steamcommunity.com/sharedfiles/filedetails/?id=1838051922'
 GIT_URL = 'https://raw.githubusercontent.com/jordanpg/tts-mtg/refs/heads/main/dist/packages/tts-mtg-importer/bundle.lua'
 LANG = 'en'
