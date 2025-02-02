@@ -53,9 +53,9 @@ __bundle_register("importer", function(require, _LOADED, __bundle_register, __bu
 --[[ Constants ]]
 
 MOD_NAME = 'Card Importer'
-version = 2.002 -- this property has to remain in lowercase as "version" to maintain compatibility with scripts like the Encoder
+version = 2.011 -- this property has to remain in lowercase as "version" to maintain compatibility with scripts like the Encoder
 WORKSHOP_ID = 'https://steamcommunity.com/sharedfiles/filedetails/?id=1838051922'
-GIT_URL = 'https://raw.githubusercontent.com/jordanpg/Tabletop-Simulator-Scripts/master/Magic/Importer.lua'
+GIT_URL = 'https://raw.githubusercontent.com/jordanpg/tts-mtg/refs/heads/main/dist/packages/tts-mtg-importer/bundle.lua'
 LANG = 'en'
 self.setName('[854FD9]' .. MOD_NAME .. ' [49D54F]' .. version)
 
