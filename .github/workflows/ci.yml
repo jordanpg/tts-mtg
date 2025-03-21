@@ -86,7 +86,7 @@ jobs:
   deploy-moxfield-proxy:
     name: Deploy Moxfield Proxy
     runs-on: ubuntu-latest
-    if: ${{ contains(needs.main.outputs.affected, 'moxfield-proxy') && github.ref == 'refs/head/main' }}
+    if: ${{ contains(needs.main.outputs.affected, 'moxfield-proxy') && github.ref == 'refs/heads/main' }}
     needs:
       - main
     permissions:
