@@ -100,7 +100,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: moxfield-proxy
-          path: ~/moxfield-proxy
+          path: ./dist/packages/moxfield-proxy
 
       # Set up Google Cloud
       - uses: google-github-actions/auth@v2
@@ -115,6 +115,6 @@ jobs:
         with:
           name: ${{ vars.MFP_SERVICE }}
           region: ${{ vars.MFP_REGION }}
-          source_dir: ~/moxfield-proxy
+          source_dir: ./dist/packages/moxfield-proxy
           runtime: nodejs22
           entry_point: MoxfieldProxy
