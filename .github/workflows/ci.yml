@@ -60,9 +60,8 @@ jobs:
         run: pnpm exec nx affected -t lint test build --exclude 'func-runner'
       - name: Save affected to output
         id: affected
-        run: echo 'affected="$(pnpm exec nx show projects --affected)"' >> "$GITHUB_OUTPUT"
-      - name: Print affected
-        run: echo "${{ steps.affected.outputs.affected }}; Importer ${{ contains(steps.affected.outputs.affected, 'tts-mtg-importer') }}; Proxy ${{ contains(steps.affected.outputs.affected, 'moxfield-proxy') }}"
+        run: |
+          echo "affected=$(pnpm exec nx show projects --affected | tr '\n' ' ')" >> "$GITHUB_OUTPUT"
 
       # For build artifacts which need publicly accessible links, individual steps should be used!
       - name: 'Upload build artifact: Importer'
