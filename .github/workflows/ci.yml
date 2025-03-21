@@ -2,12 +2,14 @@ name: CI
 
 env:
   NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN }}
+  WIF_PROVIDER: ${{ secrets.WIF_PROVIDER }}
+  GCLOUD_PROJECT_ID: ${{ secrets.GCLOUD_PROJECT_ID }}
 
 on:
   push:
-    branches:
-      - main
+    branches: ['main']
   pull_request:
+    branches: ['main']
 
 permissions:
   actions: read
@@ -16,6 +18,8 @@ permissions:
 jobs:
   main:
     runs-on: ubuntu-latest
+    outputs:
+      affected: ${{ steps.affected.outputs.affected }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -54,12 +58,56 @@ jobs:
       # Nx Affected runs only tasks affected by the changes in this PR/commit. Learn more: https://nx.dev/ci/features/affected
       - name: Perform nx affected
         run: pnpm exec nx affected -t lint test build --exclude 'func-runner'
+      - id: affected
+        run: echo "affected=$(pnpm exec nx show projects --affected --exclude 'func-runner')" >> "$GITHUB_OUTPUT"
 
       # For build artifacts which need publicly accessible links, individual steps should be used!
       - name: 'Upload build artifact: Importer'
+        if: ${{ contains(steps.affected.outputs.affected, 'tts-mtg-importer') }}
         uses: actions/upload-artifact@v4
         with:
           name: dist-importer
           path: dist/packages/tts-mtg-importer/bundle.lua
           if-no-files-found: error
           include-hidden-files: true
+
+      - name: 'Upload build arfact: Moxfield Proxy'
+        id: moxfield_proxy
+        if: ${{ contains(steps.affected.outputs.affected, 'moxfield-proxy') }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: moxfield-proxy
+          path: dist/packages/moxfield-proxy
+          if-no-files-found: error
+          include-hidden-files: true
+
+  deploy-moxfield-proxy:
+    name: Deploy Moxfield Proxy
+    runs-on: ubuntu-latest
+    if: ${{ contains(needs.main.outputs.affected, 'moxfield-proxy') && github.ref == 'refs/head/main' }}
+    needs:
+      - main
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+
+    steps:
+      - name: Download Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: moxfield-proxy
+          path: ~/moxfield-proxy
+
+      # Set up Google Cloud
+      - uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ env.WIF_PROVIDER }}
+          project_id: ${{ env.GCLOUD_PROJECT_ID }}
+
+      # Deploy to Cloud Run Function
+      - id: deploy
+        uses: google-github-actions/deploy-cloudrun@v2
+        with:
+          service: ${{ vars.MFP_SERVICE }}
+          region: ${{ vars.MFP_REGION }}
+          source: ~/moxfield-proxy

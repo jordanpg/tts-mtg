@@ -3,7 +3,7 @@
 # compiled output
 # note that /dist/packages is for compiled stuff we actually want available
 /dist/*
-!/dist/packages
+!/dist/packages/tts-mtg-importer
 tmp
 /out-tsc
 
