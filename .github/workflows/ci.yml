@@ -2,7 +2,6 @@ name: CI
 
 env:
   NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN }}
-  WIF_PROVIDER: ${{ secrets.WIF_PROVIDER }}
   GCLOUD_PROJECT_ID: ${{ secrets.GCLOUD_PROJECT_ID }}
 
 on:
@@ -103,8 +102,8 @@ jobs:
       # Set up Google Cloud
       - uses: google-github-actions/auth@v2
         with:
-          workload_identity_provider: ${{ env.WIF_PROVIDER }}
-          project_id: ${{ env.GCLOUD_PROJECT_ID }}
+          workload_identity_provider: ${{ secrets.WIF_PROVIDER }}
+          service_account: ${{ secrets.WIF_SERVICE_ACCOUNT }}
 
       # Deploy to Cloud Run Function
       - id: deploy
