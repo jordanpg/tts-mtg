@@ -113,6 +113,7 @@ jobs:
         uses: google-github-actions/deploy-cloud-functions@v3
         timeout-minutes: 10
         with:
+          project_id: ${{ env.GCLOUD_PROJECT_ID }}
           name: ${{ vars.MFP_SERVICE }}
           region: ${{ vars.MFP_REGION }}
           source_dir: ./dist/packages/moxfield-proxy
