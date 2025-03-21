@@ -53,7 +53,7 @@ __bundle_register("importer", function(require, _LOADED, __bundle_register, __bu
 --[[ Constants ]]
 
 MOD_NAME = 'Card Importer'
-version = 2.011 -- this property has to remain in lowercase as "version" to maintain compatibility with scripts like the Encoder
+version = 2.101 -- this property has to remain in lowercase as "version" to maintain compatibility with scripts like the Encoder
 WORKSHOP_ID = 'https://steamcommunity.com/sharedfiles/filedetails/?id=1838051922'
 GIT_URL = 'https://raw.githubusercontent.com/jordanpg/tts-mtg/refs/heads/main/dist/packages/tts-mtg-importer/bundle.lua'
 LANG = 'en'
@@ -1935,7 +1935,7 @@ end
 --- If the version of this script falls behind the one described in the wr parameter, 
 --- this script will automatically load the one in the wr parameter and reload itself.
 function enforceVersion(wr)
-    local v = wr.text:match('mod_name,version=\'Card Importer\',(%d+%p%d+)')
+    local v = wr.text:match('version = (%d+%p%d+)')
     log(MOD_NAME .. ' GitHub version is: ' .. v, nil, 'info')
     if v then
         v = tonumber(v)

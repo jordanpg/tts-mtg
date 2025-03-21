@@ -1,5 +1,5 @@
 --[[
-    Clean Counters v1.1.0
+    Clean Counters v1.1.1
 
     Written by GBee, edited by rubic (paradoxrevolver)
 
@@ -74,6 +74,10 @@ function onLoad(save_state)
     else
         script_state = JSON.decode(save_state)
     end
+
+    -- Set self properties.
+    -- self.setName(self.getName() .. "." .. self.getGUID())
+    self.setDescription("Script GUID: " .. self.getGUID())
     
     -- Create User-Interface.
     createUserInterface()
@@ -93,6 +97,7 @@ end
 function createUserInterface() 
     self.createInput({
         function_owner = self,
+        tooltip = self.getName() .. ": 0",
         input_function = "onValueChanged",
         position = {0,0.1,-0.45},
         value = script_state.value,
@@ -207,8 +212,10 @@ function refreshTokenUI()
         change the font color. I found the only way to may it work consistently
         was to remove the input and recreate it.
     --]]
+    removeAllInputs()
     self.createInput({
         function_owner = self,
+        tooltip = self.getName() .. ": " .. display_value,
         input_function = "onValueChanged",
         position = display_value_pos,
         font_size  = display_font_size,
@@ -218,14 +225,21 @@ function refreshTokenUI()
         height = 800,
         width = 1500,
         color = TRANSPARENT,
-    }) 
-    removeAllInputsExceptFirst()
+    })
 end
 
-function removeAllInputsExceptFirst()
+function removeAllInputs()
     local inputs = self.getInputs()
-    local lastInputIndex = #inputs-1
-    for i = 1, lastInputIndex do self.removeInput(0) end
+    local inputCount = tableLength(inputs)
+    for i = 1, inputCount do
+        self.removeInput(0)
+    end
+end
+
+function tableLength(T)
+    local count = 0
+    for _ in pairs(T) do count = count + 1 end
+    return count
 end
 
 --[[

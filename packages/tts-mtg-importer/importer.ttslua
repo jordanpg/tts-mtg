@@ -1887,7 +1887,7 @@ end
 --- If the version of this script falls behind the one described in the wr parameter, 
 --- this script will automatically load the one in the wr parameter and reload itself.
 function enforceVersion(wr)
-    local v = wr.text:match('mod_name,version=\'Card Importer\',(%d+%p%d+)')
+    local v = wr.text:match('version = (%d+%p%d+)')
     log(MOD_NAME .. ' GitHub version is: ' .. v, nil, 'info')
     if v then
         v = tonumber(v)
