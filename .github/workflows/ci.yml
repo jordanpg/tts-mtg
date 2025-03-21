@@ -110,8 +110,11 @@ jobs:
 
       # Deploy to Cloud Run Function
       - id: deploy
-        uses: google-github-actions/deploy-cloudrun@v2
+        uses: google-github-actions/deploy-cloud-functions@v3
+        timeout-minutes: 10
         with:
-          service: ${{ vars.MFP_SERVICE }}
+          name: ${{ vars.MFP_SERVICE }}
           region: ${{ vars.MFP_REGION }}
-          source: ~/moxfield-proxy
+          source_dir: ~/moxfield-proxy
+          runtime: nodejs22
+          entry_point: MoxfieldProxy
