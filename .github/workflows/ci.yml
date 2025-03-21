@@ -59,7 +59,7 @@ jobs:
       - name: Perform nx affected
         run: pnpm exec nx affected -t lint test build --exclude 'func-runner'
       - id: affected
-        run: echo "affected=$(pnpm exec nx show projects --affected --exclude 'func-runner')" >> "$GITHUB_OUTPUT"
+        run: echo "affected=\"$(pnpm exec nx show projects --affected --exclude 'func-runner')\"" >> "$GITHUB_OUTPUT"
 
       # For build artifacts which need publicly accessible links, individual steps should be used!
       - name: 'Upload build artifact: Importer'
