@@ -68,6 +68,9 @@ importers:
       eslint-config-prettier:
         specifier: ^9.0.0
         version: 9.1.0(eslint@9.16.0)
+      jsonc-eslint-parser:
+        specifier: ^2.4.0
+        version: 2.4.0
       nx:
         specifier: 20.1.4
         version: 20.1.4(@swc-node/register@1.9.2(@swc/core@1.5.29(@swc/helpers@0.5.15))(@swc/types@0.1.17)(typescript@5.5.4))(@swc/core@1.5.29(@swc/helpers@0.5.15))

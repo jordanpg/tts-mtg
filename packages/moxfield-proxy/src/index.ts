@@ -36,6 +36,8 @@ export const MoxfieldProxy: HttpFunction = async (req, res) => {
   })
     .then(async (resp) => res.status(resp.status).send(await resp.json()))
     .catch((err) =>
-      res.status(err.status).send(err instanceof Error ? err.message : String(err)),
+      res
+        .status(err.status)
+        .send(err instanceof Error ? err.message : String(err)),
     );
 };
